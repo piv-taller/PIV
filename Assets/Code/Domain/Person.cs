@@ -20,20 +20,20 @@ public class Person
     public Opinion Opinion { get; set; }
 
     /// <summary>
-    /// Gets or sets the influence.
+    /// Gets or sets the prestige.
     /// </summary>
-    public double Influence { get; set; }
+    public float Prestige { get; set; }
 
     /// <summary>
     /// Gets or sets the stubbornness.
     /// </summary>
-    public double Stubbornness { get; set; }
+    public float Stubbornness { get; set; }
 
     public Person()
     {
         Id = 0;
-        Opinion = new Opinion(new List<int>());
-        Influence = 0;
+        Opinion = new Opinion(new List<float>());
+        Prestige = 0;
         Stubbornness = 0;
     }
 
@@ -41,15 +41,14 @@ public class Person
     /// Initializes a new instance of the <see cref="Person"/> class.
     /// </summary>
     /// <param name="id"></param>
-    /// <param name="name"></param>
-    /// <param name="coords"></param>
-    /// <param name="influence"></param>
+    /// <param name="opinion"></param>
+    /// <param name="prestige"></param>
     /// <param name="stubbornness"></param>
-    public Person(int id, Opinion opinion, double influence, double stubbornness)
+    public Person(int id, Opinion opinion, float prestige, float stubbornness)
     {
         Id = id;
         Opinion = opinion;
-        Influence = influence;
+        Prestige = prestige;
         Stubbornness = stubbornness;
     }
 }

@@ -12,7 +12,7 @@ public class MovementLogic : MonoBehaviour
     public List<int> opinion;
 
     [field: SerializeField]
-    public Opinion OpinionObject = new Opinion(new List<int>());
+    public Opinion OpinionObject = new Opinion(new List<float>());
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
