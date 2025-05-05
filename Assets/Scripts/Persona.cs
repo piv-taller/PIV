@@ -7,6 +7,8 @@ public class Persona : MonoBehaviour
     public float prestigio;
     public float cabezoneria;
     public Transform cabeza, torso, ojoD, ojoI;
+    private float ruido;
+
 
     private int index;
     void Start()
@@ -16,8 +18,16 @@ public class Persona : MonoBehaviour
         for(int i = 0; i < modelo.opciones; i++) {
             opiniones[i] = ((float)Random.Range(1,2000))/1000-1;
         }
-        prestigio = ((float)Random.Range(1,1000))/1000;
-        cabezoneria = ((float)Random.Range(1,1000))/1000;
+        do {
+            ruido = Random.Range(-0.5f, 0.5f);
+            prestigio = 0.5f + ruido;
+        } while (prestigio <= 0f || prestigio >= 1f);
+        
+        do {
+            ruido = Random.Range(-0.1f, 0.1f);
+            cabezoneria = 0.1f + ruido;
+        } while (cabezoneria <= 0f || cabezoneria >= 1f);
+
     }
 
     void Update()

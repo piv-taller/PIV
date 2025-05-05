@@ -18,9 +18,7 @@ public class Modelo : MonoBehaviour
     [Header("Ajustes del grafo")]
 
     public int grado_inicial;
-
     public float sens_amigo;
-
     public float sens_desamigo;
 
     [Header("Ajustes de la conversación")]
@@ -155,6 +153,7 @@ public class Modelo : MonoBehaviour
             personas[i].ojoI.gameObject.GetComponent<Renderer>().enabled = false;
             personas[i].ojoD.gameObject.GetComponent<Renderer>().enabled = false;
         }
+
         
         
         AjustarCamara(columnas, filas, dx, dy);
@@ -162,6 +161,7 @@ public class Modelo : MonoBehaviour
 
     void Update()
     {
+
         if (!esperar && it < iteraciones) {
             StartCoroutine(Iteración());
             esperar = true;
@@ -185,6 +185,9 @@ public class Modelo : MonoBehaviour
         if (Input.GetKeyDown("r")) {
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
+
+        if (it == 1) for (int i = 0; i < p_num; i++) Debug.Log($"La cabezoneria de la persona {i} es {personas[i].cabezoneria}");
+
     }
 
     void AjustarCamara(int columnas, int filas, float dx, float dy) {
@@ -287,12 +290,12 @@ public class Modelo : MonoBehaviour
                     float opinionActual = o_temp[j];
                     float distancia = baricentro - opinionActual;
                     float nuevaOpinion;
-                    if (Mathf.Exp(-exp_conv*personas[conv[j]].cabezoneria*distancia*distancia) > (float)Random.Range(0,1000)/1000) {
-                        nuevaOpinion = opinionActual + distancia * personas[conv[j]].cabezoneria * sens_c;
+                    if (Mathf.Exp(-exp_conv*(personas[conv[j]].cabezoneria)*distancia*distancia) > (float)Random.Range(0,1000)/1000) {
+                        nuevaOpinion = opinionActual + distancia * (1 - personas[conv[j]].cabezoneria) * sens_c;
                         //Debug.Log("La conversación ha salido bien!");
                     } else {
                         baricentro = (baricentro > 0 ? -1 : 1);
-                        nuevaOpinion = opinionActual + (baricentro - opinionActual) * personas[conv[j]].cabezoneria * sens_c * (1-Mathf.Exp(-exp_conv*personas[conv[j]].cabezoneria*distancia*distancia));
+                        nuevaOpinion = opinionActual + (baricentro - opinionActual) * (1 - personas[conv[j]].cabezoneria) * sens_c * (1-Mathf.Exp(-exp_conv*(1-personas[conv[j]].cabezoneria)*distancia*distancia));
                         //Debug.Log("La conversación ha salido mal...");
                     }
                     //Debug.Log($"Se modifica la opinión {opinionActual} -> {nuevaOpinion}");
@@ -315,6 +318,8 @@ public class Modelo : MonoBehaviour
                 if (Mathf.Exp(-prob*prob) > (float)Random.Range(0,1000)/1000) {
                     Desamigo(conv[i],conv[j]);
                     Debug.Log($"Las personas {conv[i]} y {conv[j]} han dejado de ser amigos! D = {sum_op/(2*opciones)}, a = {(relaciones[conv[i]].Count+relaciones[conv[j]].Count)}");
+                    Debug.Log($"Las opiniones de la persona {conv[i]} y {conv[j]} son las siguientes");
+                    for (int op = 0; op < opciones; op++) Debug.Log($"Opcion {op}:{personas[conv[i]].opiniones[op]} y {personas[conv[j]].opiniones[op]}");
                 }
 
                 prob = (sum_op/(2*opciones))*sens_amigo*(relaciones[conv[i]].Count+relaciones[conv[j]].Count);
@@ -322,6 +327,8 @@ public class Modelo : MonoBehaviour
                 if (Mathf.Exp(-prob*prob) > (float)Random.Range(0,1000)/1000) {
                     Amigo(conv[i],conv[j]);
                     Debug.Log($"Las personas {conv[i]} y {conv[j]} Ahora son amigos! D = {sum_op/(2*opciones)}, a = {(relaciones[conv[i]].Count+relaciones[conv[j]].Count)}");
+                    Debug.Log($"Las opiniones de la persona {conv[i]} y {conv[j]} son las siguientes");
+                    for (int op = 0; op < opciones; op++) Debug.Log($"Opcion {op}:{personas[conv[i]].opiniones[op]} y {personas[conv[j]].opiniones[op]}");
                 }
 
                 
@@ -349,7 +356,7 @@ public class Modelo : MonoBehaviour
             
             for (int j = 0; j < publ_num; j++) {
                 //Debug.Log("Persona " + publ[j] + ", opinion " + i + ": " + personas[publ[j]].opiniones[i] + " --> " + (personas[publ[j]].opiniones[i] + (baricentro[j] - personas[publ[j]].opiniones[i]) * personas[publ[j]].cabezoneria * 0.3f));
-                personas[publ[j]].ModificarOpinion(i,personas[publ[j]].opiniones[i] + (baricentro[j] - personas[publ[j]].opiniones[i]) * personas[publ[j]].cabezoneria * sens_p);
+                personas[publ[j]].ModificarOpinion(i,personas[publ[j]].opiniones[i] + (baricentro[j] - personas[publ[j]].opiniones[i]) * (1 - personas[publ[j]].cabezoneria) * sens_p);
             }
         }
     }
