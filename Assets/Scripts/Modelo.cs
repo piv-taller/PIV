@@ -8,10 +8,31 @@ using UnityEngine.SceneManagement;
 
 public class Modelo : MonoBehaviour
 {
+    [Header("Condiciones iniciales")]
+
+    public int opciones;
+    public int p_num;
+    public int iteraciones;
+    public float t = 0;
+
+    [Header("Ajustes del grafo")]
+
+    public int grado_inicial;
+
+    public float sens_amigo;
+
+    public float sens_desamigo;
+
+    [Header("Ajustes de la conversación")]
+
+    public float sens_c;
+    public float sens_p;
+    public float exp_conv;
+
+    [Header("Prefabs y asignación de objetos")]  
+
     public GameObject personaPrefab;
     public Camera camara;
-    public int opciones, p_num, iteraciones, grado_inicial;
-    public float sens_c, sens_p, exp;
     private List<Persona> personas = new List<Persona>();
     private float dx = 2f;
     private float dy = 3f;
@@ -21,7 +42,6 @@ public class Modelo : MonoBehaviour
     private int it = 0;
     int[] contador, n_conv;
     float[] resultados_i, resultados_f;
-    public float t = 0;
     public List<Color> colores;
     public TMP_Text textvot;
     public GameObject grafico;
@@ -150,11 +170,15 @@ public class Modelo : MonoBehaviour
             for (int i = 0; i < opciones; i++) {
                 resultados_f[i] = (float)System.Math.Truncate(((float)contador[i])/p_num * 100000) / 1000;
             }
+            
+            for (int i = 0; i < p_num; i++) Debug.Log($"Tenemos que los amigos de {i} son {string.Join(", ", relaciones[i])}");
+
             Debug.Log("Se ha terminado el experimento! Resultados:");
             Debug.Log("Cada persona ha tenido esta cantidad de conversaciones: " + string.Join(", ",n_conv));
             for (int i = 0; i < opciones; i++) {
                 Debug.Log($"La opción {i} ha pasado de {resultados_i[i]} -> {resultados_f[i]}");
             } 
+
             esperar = true;
         }
 
@@ -227,6 +251,12 @@ public class Modelo : MonoBehaviour
         return indiceMax;
     }
 
+    float Expn (float a, int n) {
+        float b = 1;
+        for (int i = 0; i < n; i++) b*=a;
+        return b;
+    }
+
     void ActualizarTextoVotos(int[] contador) {
         string texto = "Votacions:\n";
         float[] opm = new float[opciones];
@@ -242,32 +272,65 @@ public class Modelo : MonoBehaviour
 
     void Conversación(int conv_num, int[] conv) {
         for (int opcion = 0; opcion < opciones; opcion++) {
-            float[] o_temp = new float[conv_num];
-            float[] p_temp = new float[conv_num];
+            if (Random.Range(0,2) == 0) {
+                float[] o_temp = new float[conv_num];
+                float[] p_temp = new float[conv_num];
 
-            for (int j = 0; j < conv_num; j++) {
-                o_temp[j] = personas[conv[j]].opiniones[opcion];
-                p_temp[j] = personas[conv[j]].prestigio;
-            }
-
-            float baricentro = Baricentro(conv_num, p_temp, o_temp);
-
-            for (int j = 0; j < conv_num; j++) {
-                float opinionActual = personas[conv[j]].opiniones[opcion];
-                float distancia = (baricentro - opinionActual);
-                float nuevaOpinion;
-                if (Mathf.Exp(-exp*personas[conv[j]].cabezoneria*distancia*distancia) > (float)Random.Range(0,1000)/1000) {
-                    nuevaOpinion = opinionActual + distancia * personas[conv[j]].cabezoneria * sens_c;
-                    Debug.Log("La conversación ha salido bien!");
-                } else {
-                    baricentro = (baricentro > 0 ? -1 : 1);
-                    nuevaOpinion = opinionActual + (baricentro - opinionActual) * personas[conv[j]].cabezoneria * sens_c * (1-Mathf.Exp(-exp*personas[conv[j]].cabezoneria*distancia*distancia));
-                    Debug.Log("La conversación ha salido mal...");
+                for (int j = 0; j < conv_num; j++) {
+                    o_temp[j] = personas[conv[j]].opiniones[opcion];
+                    p_temp[j] = personas[conv[j]].prestigio;
                 }
-                //Debug.Log($"Se modifica la opinión {opinionActual} -> {nuevaOpinion}");
-                personas[conv[j]].ModificarOpinion(opcion, nuevaOpinion);
+
+                float baricentro = Baricentro(conv_num, p_temp, o_temp);
+
+                for (int j = 0; j < conv_num; j++) {
+                    float opinionActual = o_temp[j];
+                    float distancia = baricentro - opinionActual;
+                    float nuevaOpinion;
+                    if (Mathf.Exp(-exp_conv*personas[conv[j]].cabezoneria*distancia*distancia) > (float)Random.Range(0,1000)/1000) {
+                        nuevaOpinion = opinionActual + distancia * personas[conv[j]].cabezoneria * sens_c;
+                        //Debug.Log("La conversación ha salido bien!");
+                    } else {
+                        baricentro = (baricentro > 0 ? -1 : 1);
+                        nuevaOpinion = opinionActual + (baricentro - opinionActual) * personas[conv[j]].cabezoneria * sens_c * (1-Mathf.Exp(-exp_conv*personas[conv[j]].cabezoneria*distancia*distancia));
+                        //Debug.Log("La conversación ha salido mal...");
+                    }
+                    //Debug.Log($"Se modifica la opinión {opinionActual} -> {nuevaOpinion}");
+                    personas[conv[j]].ModificarOpinion(opcion, nuevaOpinion);
+                }
             }
         }
+        float sum_op = 0;
+        float prob = 0;
+
+        for (int i = 0; i < conv_num; i++) {
+            for (int j = i+1; j < conv_num; j++) {
+                sum_op = 0;
+                for (int opcion = 0; opcion < opciones; opcion++) {
+                    sum_op += Mathf.Abs(personas[conv[i]].opiniones[opcion] - personas[conv[j]].opiniones[opcion]);
+                }
+
+                prob = (1-sum_op/(2*opciones))*sens_desamigo/(1+relaciones[conv[i]].Count+relaciones[conv[j]].Count);
+
+                if (Mathf.Exp(-prob*prob) > (float)Random.Range(0,1000)/1000) {
+                    Desamigo(conv[i],conv[j]);
+                    Debug.Log($"Las personas {conv[i]} y {conv[j]} han dejado de ser amigos! D = {sum_op/(2*opciones)}, a = {(relaciones[conv[i]].Count+relaciones[conv[j]].Count)}");
+                }
+
+                prob = (sum_op/(2*opciones))*sens_amigo*(relaciones[conv[i]].Count+relaciones[conv[j]].Count);
+
+                if (Mathf.Exp(-prob*prob) > (float)Random.Range(0,1000)/1000) {
+                    Amigo(conv[i],conv[j]);
+                    Debug.Log($"Las personas {conv[i]} y {conv[j]} Ahora son amigos! D = {sum_op/(2*opciones)}, a = {(relaciones[conv[i]].Count+relaciones[conv[j]].Count)}");
+                }
+
+                
+
+            }
+        }
+        
+        
+
     }
     
     void Publicación(int publ_num, int[] publ, int emisor) {
@@ -377,7 +440,7 @@ public class Modelo : MonoBehaviour
             conv_num++;
         }
 
-        if(it%100 == 0) Debug.Log("Iteración número " + it);
+        if(it%10 == 0) Debug.Log("Iteración número " + it);
 
         //HACEMOS UNA CONVERSACIÓN
 

@@ -620,8 +620,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20
-  m_fontSizeBase: 20
+  m_fontSize: 8
+  m_fontSizeBase: 8
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -932,16 +932,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8166fc2eda4fcc448f1c54cc03aa4f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  opciones: 4
+  p_num: 300
+  iteraciones: 10000
+  t: 0
+  grado_inicial: 4
+  sens_amigo: 10
+  sens_desamigo: 25
+  sens_c: 0.4
+  sens_p: 0.1
+  exp_conv: 3
   personaPrefab: {fileID: 7732396878898567374, guid: fab38bb97f7be754cb6f511822c40ab0, type: 3}
   camara: {fileID: 330585545}
-  opciones: 4
-  p_num: 200
-  iteraciones: 10000
-  grado_inicial: 4
-  sens_c: 0.3
-  sens_p: 0
-  exp: 1
-  t: 0
   colores: []
   textvot: {fileID: 589162210}
   grafico: {fileID: 273113238}
