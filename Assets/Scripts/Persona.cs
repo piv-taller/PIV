@@ -24,8 +24,8 @@ public class Persona : MonoBehaviour
         } while (prestigio <= 0f || prestigio >= 1f);
         
         do {
-            ruido = Random.Range(-0.1f, 0.1f);
-            cabezoneria = 0.1f + ruido;
+            ruido = Random.Range(-0.5f, 0.5f);
+            cabezoneria = 0.5f + ruido;
         } while (cabezoneria <= 0f || cabezoneria >= 1f);
 
     }
@@ -41,5 +41,11 @@ public class Persona : MonoBehaviour
 
     public void ModificarOpinion(int i, float o) {
         opiniones[i] = o;
+    }
+    public void ModificarPrestigio(float p) {
+        prestigio = p;
+    }
+    public void ModificarCabezoneria(float c) {
+        cabezoneria = c;
     }
 }

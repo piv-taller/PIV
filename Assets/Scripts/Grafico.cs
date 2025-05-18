@@ -52,7 +52,18 @@ public class Grafico : MonoBehaviour
 
         // Si deseas usar coordenadas locales
         line.useWorldSpace = false;
+        
         return line;
+    }
+
+    public void ResetLine(int index) 
+    {
+        if (index >= 0 && index < lines.Length && lines[index] != null)
+        {
+            Destroy(lines[index].gameObject);
+            lines[index] = CreateLine(index);
+            points[index] = new List<Vector3>();
+        }
     }
 
     // Método para agregar un nuevo punto a una línea específica y actualizarla
