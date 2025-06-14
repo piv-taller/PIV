@@ -6,7 +6,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine.SceneManagement;
 
-public class Modelo : MonoBehaviour
+public class Modelo_Rumania : MonoBehaviour
 {
     [Header("Condiciones iniciales")]
 
@@ -64,6 +64,8 @@ public class Modelo : MonoBehaviour
     public float epsilon;
     private float[] distribución;
     private int[] conversaciones;
+    public int grupo;
+    public int g_seguidores;
 
     void Start()
     {
@@ -164,7 +166,7 @@ public class Modelo : MonoBehaviour
         for (int i = 0; i < p_num; i++) {
             int[] p = Permutacion(p_num);
             for (int j = 0; j < p_num; j++) {
-                if (Random.Range(0,2) == 0) break;
+                if (Random.Range(0,2) == 0 && (i > grupo || j > g_seguidores)) break;
                 else redes_sociales[i].Add(p[j]);
             }
         }
@@ -214,6 +216,60 @@ public class Modelo : MonoBehaviour
 
     void Update()
     {
+
+        if (it == 0) {
+            for (int i = 0; i < p_num; i++) {
+                if (i < grupo)
+                {
+                    personas[i].ModificarCabezoneria((float)Random.Range(0.8f, 0.99f));
+                    personas[i].ModificarPrestigio((float)Random.Range(0.8f, 0.99f));
+                }
+                else
+                {
+                    personas[i].ModificarCabezoneria((float)Random.Range(0.01f, 0.3f));
+                }
+                for (int opcion = 0; opcion < opciones; opcion++) {
+                    if (i < grupo)
+                    {
+                        personas[i].ModificarOpinion(opcion, (opcion == opciones - 1 ? Random.Range(-0.50f, 0.99f) : Random.Range(-0.99f, 0.5f)));
+                    }
+                    else
+                    {
+                        if (i - grupo < 172)
+                        {
+                            personas[i].ModificarOpinion(opcion, opcion == 0 ? Random.Range(0f, 0.99f) : Random.Range(-0.99f, 0.25f));
+                        }
+                        else if (i - grupo - 172 < 234)
+                        {
+                            personas[i].ModificarOpinion(opcion, opcion == 1 ? Random.Range(0f, 0.99f) : Random.Range(-0.99f, 0.25f));
+                        }
+                        else if (i - grupo - 406 < 198)
+                        {
+                            personas[i].ModificarOpinion(opcion, opcion == 2 ? Random.Range(0f, 0.99f) : Random.Range(-0.99f, 0.25f));
+                        }
+                        else if (i - grupo - 604 < 62)
+                        {
+                            personas[i].ModificarOpinion(opcion, opcion == 3 ? Random.Range(0f, 0.99f) : Random.Range(-0.99f, 0.25f));
+                        }
+                        else if (i - grupo - 666 < 171)
+                        {
+                            personas[i].ModificarOpinion(opcion, opcion == 4 ? Random.Range(0f, 0.99f) : Random.Range(-0.99f, 0.25f));
+                        }
+                        else if (i - grupo - 837 < 38)
+                        {
+                            personas[i].ModificarOpinion(opcion, opcion == 5 ? Random.Range(0f, 0.99f) : Random.Range(-0.99f, 0.25f));
+                        }
+                        else
+                        {
+                            personas[i].ModificarOpinion(opcion, Random.Range(-0.99f, 0f));
+                        }
+                        if (opcion == opciones-1) personas[i].ModificarOpinion(opcion, Random.Range(-0.99f,0f));
+
+                    }
+                }
+            }
+        }
+
         if (!esperar && it < iteraciones) {
             StartCoroutine(Iteración());
             esperar = true;
@@ -330,7 +386,7 @@ public class Modelo : MonoBehaviour
 
     void Conversación(int conv_num, int[] conv) {
         for (int i = 0; i < p_num; i++) prev_ind[i] = IndiceMaximo(personas[i].opiniones);
-        for (int opcion = 0; opcion < opciones; opcion++) {
+        for (int opcion = 0; opcion < opciones - 1; opcion++) {
             if (Random.Range(0,2) == 0) {
                 float[] o_temp = new float[conv_num];
                 float[] p_temp = new float[conv_num];
@@ -374,11 +430,11 @@ public class Modelo : MonoBehaviour
         for (int i = 0; i < conv_num; i++) {
             for (int j = i+1; j < conv_num; j++) {
                 sum_op = 0;
-                for (int opcion = 0; opcion < opciones; opcion++) {
+                for (int opcion = 0; opcion < opciones-1; opcion++) {
                     sum_op += Mathf.Abs(personas[conv[i]].opiniones[opcion] - personas[conv[j]].opiniones[opcion]);
                 }
 
-                prob = (1-sum_op/(2*(opciones)))*sens_desamigo/(1+relaciones[conv[i]].Count+relaciones[conv[j]].Count);
+                prob = (1-sum_op/(2*(opciones-1)))*sens_desamigo/(1+relaciones[conv[i]].Count+relaciones[conv[j]].Count);
 
                 if (Mathf.Exp(-prob*prob) > (float)Random.Range(0,1000)/1000) {
                     Desamigo(conv[i],conv[j]);
@@ -387,7 +443,7 @@ public class Modelo : MonoBehaviour
                     //yfor (int op = 0; op < opciones; op++) Debug.Log($"Opcion {op}:{personas[conv[i]].opiniones[op]} y {personas[conv[j]].opiniones[op]}");
                 }
 
-                prob = (sum_op/(2*(opciones)))*sens_amigo*(relaciones[conv[i]].Count+relaciones[conv[j]].Count);
+                prob = (sum_op/(2*(opciones-1)))*sens_amigo*(relaciones[conv[i]].Count+relaciones[conv[j]].Count);
 
                 if (Mathf.Exp(-prob*prob) > (float)Random.Range(0,1000)/1000) {
                     Amigo(conv[i],conv[j]);
@@ -446,11 +502,11 @@ public class Modelo : MonoBehaviour
 
         for (int i = 0; i < publ_num; i++) {
             sum_op = 0;
-            for (int opcion = 0; opcion < opciones; opcion++) {
+            for (int opcion = 0; opcion < opciones-1; opcion++) {
                 sum_op += Mathf.Abs(personas[publ[i]].opiniones[opcion] - personas[emisor].opiniones[opcion]);
             }
 
-            prob = (1-sum_op/(2*(opciones)))*sens_deseguidor;
+            prob = (1-sum_op/(2*(opciones-1)))*sens_deseguidor;
 
             if (Mathf.Exp(-prob*prob) > (float)Random.Range(0,1000)/1000 && !redes_sociales[emisor].Contains(i)) {
                 redes_sociales[emisor].Add(i);
@@ -459,7 +515,7 @@ public class Modelo : MonoBehaviour
                 //for (int op = 0; op < opciones; op++) Debug.Log($"Opcion {op}:{personas[publ[i]].opiniones[op]} y {personas[emisor].opiniones[op]}");
             }
 
-            prob = sum_op/(2*(opciones))*sens_seguidor;
+            prob = sum_op/(2*(opciones-1))*sens_seguidor;
 
             if (Mathf.Exp(-prob*prob) > (float)Random.Range(0,1000)/1000 && redes_sociales[emisor].Contains(i)) {
                 redes_sociales[emisor].Remove(i);
@@ -578,12 +634,15 @@ public class Modelo : MonoBehaviour
         }
         
 
-        Conversación(conv_num, conv);
+        if (it%5 == 0)Conversación(conv_num, conv);
 
         //ALGUIEN HACE UNA PUBLICACIÓN
         
         int[] publ;
-        int emisor = Random.Range(0,p_num);
+        int emisor = (Random.Range(0,3) == 0 ? Random.Range(0,p_num) : Random.Range(0,grupo));
+        if (emisor < 10) {
+            Debug.Log($"La persona {emisor} ha hecho una publicación");
+        }
         while(redes_sociales[emisor].Count == 0) emisor = Random.Range(0,p_num);
 
         publ = Elegir_publicación(emisor);
@@ -610,7 +669,7 @@ public class Modelo : MonoBehaviour
             graph.AddPoint(i, new Vector3(it / (float)iteraciones * (camGrafico1.orthographicSize * 2 * camGrafico1.aspect) - camGrafico1.orthographicSize * camGrafico1.aspect+314.2f, (((float)contador[i]) / p_num * 100) * (camGrafico1.orthographicSize * 2) / 100 - camGrafico1.orthographicSize+138.9684f, 0));
         }
 
-        if (it%200 == 0) {
+        if (it%10 == 0) {
             for (int i = 0; i < opciones; i++) graph2.ResetLine(i);
             for (int i = 0; i < opciones; i++) {
                 // 1) Capturo y ordeno las opiniones de la opción i

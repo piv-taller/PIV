@@ -916,8 +916,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 12
-  m_fontSizeBase: 12
+  m_fontSize: 8
+  m_fontSizeBase: 8
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1755,13 +1755,13 @@ MonoBehaviour:
   p_num: 300
   iteraciones: 10000
   t: 0
-  grado_inicial: 300
-  sens_amigo: 1e+10
-  sens_desamigo: 1e+10
+  grado_inicial: 4
+  sens_amigo: 1
+  sens_desamigo: 2
   sens_seguidor: 1
   sens_deseguidor: 2
   sens_c: 0.5
-  sens_p: 0
+  sens_p: 0.25
   exp_conv: 7.5
   exp_publ: 7.5
   camPersonas: {fileID: 330585545}
@@ -1961,8 +1961,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 175}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchoredPosition: {x: 0, y: 162.5}
+  m_SizeDelta: {x: 100, y: 108.33}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2012714286
 MonoBehaviour:

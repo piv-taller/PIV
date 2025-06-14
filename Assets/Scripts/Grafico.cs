@@ -16,14 +16,9 @@ public class Grafico : MonoBehaviour
     {
         opciones = modelo.GetComponent<Modelo>().opciones;
         colores = new Color[opciones];
-        // Si no se han definido colores, se asignan aleatorios
-        for (int i = 0; i < opciones; i++) {
-            float hue = i / (float)opciones; // Espaciamos el Hue equitativamente
-            Color color = Color.HSVToRGB(hue, 0.8f, 1.0f); // Alta saturación y brillo
-            colores[i] = color;
-        }
 
-        // Inicializar arrays
+        for (int i = 0; i < opciones; i++) colores[i] = Color.HSVToRGB(i / (float)opciones, 0.8f, 1.0f);;
+        
         points = new List<Vector3>[opciones];
         lines = new LineRenderer[opciones];
 
